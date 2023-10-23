@@ -99,29 +99,61 @@ def handle_userinput(user_question):
 
 def main():
     load_dotenv()
+    # Load environment variables from a .env file
+    
     st.set_page_config(page_title="UWI Chat-Bot", page_icon=":books:")
+    # Set Streamlit page configurations including title and icon
+  
     st.write(css, unsafe_allow_html=True)
+    # Write CSS styles for the page, allowing HTML rendering
 
     if "conversation" not in st.session_state:
+        # Check if "conversation" and "chat_history" are present in the session state, initializing them if not
         st.session_state.conversation = None
     if "chat_history" not in st.session_state:
         st.session_state.chat_history = None
 
     st.header("UWI Chat-Bot :books:")
+    # Display a header for the chatbot
+    
     user_question = st.text_input("Ask a question about your documents:")
+    # Create a text input field for the user to ask questions about their documents
+    
     if user_question:
         handle_userinput(user_question)
-
+# If the user has entered a question, call the 'handle_userinput' function to process it
+   
+    
     with st.sidebar:
+        # Create a sidebar for additional functionality
+        
         st.subheader("Your documents")
+        # Display a subheader for user's documents
+
+
+         # Allow users to upload PDF documents with a file uploader
         pdf_docs = st.file_uploader(
             "Upload your PDFs here and click on 'Process'. Disclaimer: Any information uploaded is at your risk. Please refrain from entering personal information.  ", accept_multiple_files=True)
+
+        
         if st.button("Process"):
             with st.spinner("Processing"):
+ # If the "Process" button is clicked, process the uploaded documents
+
+                
                 raw_text = get_pdf_text(pdf_docs)
+ # Extract text from the uploaded PDF documents
+                
                 text_chunks = get_text_chunks(raw_text)
+    # Split the text into smaller chunks for processing
+                
                 vectorstore = get_vectorstore(text_chunks)
+# Create a vector store for the text chunks
+                
                 st.session_state.conversation = get_conversation_chain(vectorstore)
+# Generate a conversation chain based on the vector store
+
 
 if __name__ == '__main__':
     main()
+    # Check if the script is being run as the main program and call the 'main' function
