@@ -78,21 +78,32 @@ def get_conversation_chain(vectorstore):
     )
     return conversation_chain # This returns the conversation chain 
 
-
+#The purpose this function is to handle user input and display a conversation. 
+#This function is designed for a conversational interface, where a user can input questions or messages,
+#and the application responds with a conversation history that includes both the user's input and the system's responses.
 def handle_userinput(user_question):
+    
     if st.session_state.conversation:
+        #This line checks whether the conversation attribute is present in the st.session_state object. It assumes that there is a session state object called st with a conversation attribute.
         response = st.session_state.conversation({'question': user_question})
+        # If conversation exists in the session state, this line calls the conversation function, passing a dictionary with a 'question' key that holds the user_question. The response is stored in the response variable.
         st.session_state.chat_history = response['chat_history']
-
+#This line extracts the 'chat_history' from the response and assigns it to the chat_history key in the session_state object. 
         for i, message in enumerate(st.session_state.chat_history):
+            #This line initiates a loop that iterates through the chat_history. It uses the enumerate function to keep track of the index (i) and the current message.
             if i % 2 == 0:
+                #Inside the loop, this line checks if the current index i is even. It's used to differentiate between user and bot messages since typically user messages and bot responses alternate.
                 if hasattr(message, 'link'):
+                    #This line checks if the current message has an attribute named 'link'.
                     st.markdown(user_template.replace(
                         "{{MSG}}", f'<a href="{message.link}" target="_blank">{message.content}</a>'), unsafe_allow_html=True)
+                    #If the message has a 'link' attribute, this line generates a link using the message's content and presents it as a markdown link that can be clicked to open in a new tab.
                 else:
                     st.write(user_template.replace("{{MSG}}", message.content), unsafe_allow_html=True)
+                    #This line uses a template (user_template) to format the user's message by replacing "{{MSG}}" with the content of the current message.
             else:
                 st.write(bot_template.replace("{{MSG}}", message.content), unsafe_allow_html=True)
+                # If the current index i is odd (indicating a bot response), this branch is executed.
     else:
         # Handle the case where the conversation is not set up yet
         st.write("Please upload and process your documents first.")
